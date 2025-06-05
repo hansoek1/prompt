@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>버튼 선택 게임</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 30px;
+            text-align: center;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #scoreDisplay, #answerLog {
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #answerLog {
+            text-align: left;
+            max-width: 500px;
+            margin: 20px auto;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            white-space: normal;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>정답 버튼을 찾아라!</h1>
+    <p>3개의 버튼 중 하나를 선택하세요. 정답이면 +10점, 오답이면 -5점.<br>
+       정답 2연속 성공 시 +5점 보너스!<br>
+       정답 3연속 성공 시 +10점 보너스!<br>
+       총 30번 도전!</p>
+
+    <div>
+        <button onclick="checkAnswer(0)">버튼 1</button>
+        <button onclick="checkAnswer(1)">버튼 2</button>
+        <button onclick="checkAnswer(2)">버튼 3</button>
+    </div>
+
+    <div id="scoreDisplay">점수: 0점 | 시도: 0 / 30</div>
+    <div id="answerLog">✅ 정답 버튼 로그:<br></div>
+
+    <script>
+        let score = 0;
+        let attempts = 0;
+        let correctButton = Math.floor(Math.random() * 3);
+        let streak = 0;
+        let perfect = true;
+
+        function checkAnswer(clickedIndex) {
+            if (attempts >= 30) return;
+
+            const isCorrect = clickedIndex === correctButton;
+            let gainedPoints = 0;
+
+            if (isCorrect) {
+                gainedPoints += 10;
+                streak++;
+
+                if (streak % 3 === 0) {
+                    gainedPoints += 10; // 3연속 보너스
+                } else if (streak % 3 !== 0 && streak % 2 === 0) {
+                    gainedPoints += 5; // 2연속 보너스
+                }
+            } else {
+                gainedPoints -= 5;
+                streak = 0;
+                perfect = false;
+            }
+
+            score += gainedPoints;
+            attempts++;
+
+            const answerLog = document.getElementById("answerLog");
+            answerLog.innerHTML += `${attempts}회차 정답: 버튼 ${correctButton + 1} ` +
+                `(선택: 버튼 ${clickedIndex + 1} → ${isCorrect ? '✅ 정답' : '❌ 오답'})<br>` +
+                `획득 점수: ${gainedPoints > 0 ? '+' : ''}${gainedPoints}점<br><br>`;
+
+            const display = document.getElementById("scoreDisplay");
+            if (attempts < 30) {
+                display.textContent = `점수: ${score}점 | 시도: ${attempts} / 30`;
+                correctButton = Math.floor(Math.random() * 3);
+            } else {
+                if (perfect) {
+                    score += 30;
+                    answerLog.innerHTML += `<br>🏆 퍼펙트 보너스 +30점 획득!`;
+                }
+                display.textContent = `🎉 게임 종료! 최종 점수: ${score}점`;
+            }
+        }
+    </script>
+
+</body>
+</html>
